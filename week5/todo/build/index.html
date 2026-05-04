@@ -1,11 +1,269 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Font Preview</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;700&family=Roboto+Mono:wght@400;700&family=Pacifico&family=Bebas+Neue&family=Lobster&family=Righteous&family=Cinzel:wght@400;700&family=Shadows+Into+Light&family=Orbitron:wght@400;700&family=Comfortaa:wght@300;700&family=Dancing+Script:wght@400;700&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #0f0f23;
+            color: #fff;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+        .input-section {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #aaa;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            font-size: 1.2rem;
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        input[type="text"]:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102,126,234,0.2);
+        }
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .control-group label {
+            margin: 0;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+        input[type="range"] {
+            width: 120px;
+            accent-color: #667eea;
+        }
+        .size-value {
+            color: #667eea;
+            font-weight: 700;
+            min-width: 40px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.2rem;
+        }
+        .card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(102,126,234,0.4);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .card:hover::before { opacity: 1; }
+        .font-name {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #667eea;
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+        }
+        .preview-text {
+            font-size: 2rem;
+            line-height: 1.4;
+            word-break: break-word;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(102,126,234,0.2);
+            border: 1px solid rgba(102,126,234,0.3);
+            color: #667eea;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+        .card:hover .copy-btn { opacity: 1; }
+        .copy-btn:hover {
+            background: #667eea;
+            color: #fff;
+        }
+        .copy-btn.copied {
+            background: #22c55e;
+            border-color: #22c55e;
+            color: #fff;
+        }
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #22c55e;
+            color: #fff;
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+<base target="_blank">
 </head>
 <body>
-  
+    <div class="container">
+        <h1>Font Preview</h1>
+        <p class="subtitle">lets transform your fonts</p>
+
+        <div class="input-section">
+            <input type="text" id="textInput" placeholder="Type something here..." value="Hello World" autocomplete="off">
+            <div class="controls">
+                <div class="control-group">
+                    <label for="sizeSlider">Size:</label>
+                    <input type="range" id="sizeSlider" min="16" max="72" value="32">
+                    <span class="size-value" id="sizeValue">32px</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid" id="fontGrid"></div>
+    </div>
+
+    <div class="toast" id="toast">Copied to clipboard!</div>
+
+    <script>
+        const fonts = [
+            { name: 'Playfair Display', family: "'Playfair Display', serif", desc: 'Elegant serif' },
+            { name: 'Montserrat', family: "'Montserrat', sans-serif", desc: 'Clean sans' },
+            { name: 'Roboto Mono', family: "'Roboto Mono', monospace", desc: 'Code style' },
+            { name: 'Pacifico', family: "'Pacifico', cursive", desc: 'Handwritten' },
+            { name: 'Bebas Neue', family: "'Bebas Neue', sans-serif", desc: 'Bold display' },
+            { name: 'Lobster', family: "'Lobster', cursive", desc: 'Retro script' },
+            { name: 'Righteous', family: "'Righteous', cursive", desc: 'Geometric' },
+            { name: 'Cinzel', family: "'Cinzel', serif", desc: 'Roman style' },
+            { name: 'Shadows Into Light', family: "'Shadows Into Light', cursive", desc: 'Casual hand' },
+            { name: 'Orbitron', family: "'Orbitron', sans-serif", desc: 'Sci-fi' },
+            { name: 'Comfortaa', family: "'Comfortaa', cursive", desc: 'Rounded' },
+            { name: 'Dancing Script', family: "'Dancing Script', cursive", desc: 'Flowing script' },
+            { name: 'Space Grotesk', family: "'Space Grotesk', sans-serif", desc: 'Modern' },
+            { name: 'System Serif', family: "Georgia, 'Times New Roman', serif", desc: 'Classic' },
+            { name: 'System Sans', family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", desc: 'System default' },
+            { name: 'Courier', family: "'Courier New', Courier, monospace", desc: 'Typewriter' },
+        ];
+
+        const textInput = document.getElementById('textInput');
+        const sizeSlider = document.getElementById('sizeSlider');
+        const sizeValue = document.getElementById('sizeValue');
+        const fontGrid = document.getElementById('fontGrid');
+        const toast = document.getElementById('toast');
+
+        function render() {
+            const text = textInput.value || 'Hello World';
+            const size = sizeSlider.value;
+            sizeValue.textContent = size + 'px';
+
+            fontGrid.innerHTML = fonts.map((font, i) => `
+                <div class="card">
+                    <button class="copy-btn" onclick="copyText(${i})">Copy</button>
+                    <div class="font-name">${font.name} <span style="color:#666;font-weight:400;">— ${font.desc}</span></div>
+                    <div class="preview-text" style="font-family:${font.family};font-size:${size}px;">${escapeHtml(text)}</div>
+                </div>
+            `).join('');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function copyText(index) {
+            const text = textInput.value || 'Hello World';
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.querySelectorAll('.copy-btn')[index];
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                toast.classList.add('show');
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                    toast.classList.remove('show');
+                }, 1500);
+            });
+        }
+
+        textInput.addEventListener('input', render);
+        sizeSlider.addEventListener('input', render);
+        render();
+    </script>
 </body>
 </html>
